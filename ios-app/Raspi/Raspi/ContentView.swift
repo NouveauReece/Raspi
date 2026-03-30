@@ -9,11 +9,16 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
+    
+    private let nfcBridge = NFCBridge()
+
     var body: some View {
-        VStack {
-            WebView(url: URL(string: "https://www.apple.com")!)
-        }
-        .padding()
+        WebView(url: URL(string: "http://localhost:4321/")!, nfcBridge: nfcBridge)
+            .webViewBackForwardNavigationGestures(.disabled)
+            .scrollBounceBehavior(.basedOnSize, axes: [.vertical, .horizontal])
+            .webViewLinkPreviews(.disabled)
+            .webViewMagnificationGestures(.disabled)
+            .ignoresSafeArea(edges: .bottom)
     }
 }
 
