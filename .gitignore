@@ -32,3 +32,5 @@ playground.xcworkspace
 # .swiftpm
 
 .build/
+
+__pycache__
