@@ -8,6 +8,9 @@ import subprocess
 import requests
 import signal
 
+from playsound import playsound
+
+from sox import *
 from url import *
 from gpio import *
 from source import *
@@ -102,8 +105,11 @@ if __name__ == "__main__":
         # clear current mopidy queue
         send_message("clear")
 
+        # play silent noise through speakers
+        # start_sox('dac')
+        
         # set default speaker volumes
-        set_volume('dac', 0.1)
+        set_volume('dac', 0.3)
         set_volume('builtin', 0.5)
         make_request("core.mixer.set_volume", {"volume" : 50})
 
@@ -119,6 +125,9 @@ if __name__ == "__main__":
         
             if command == "q":
                 break
+            elif command == "startup":
+                playsound("/home/raspi/sounds/startup.mp3")
+                continue
             elif command == "mopidy_volume_set":
                 volume = int(input("Enter a value [0-100]: "))
                 volume = min(max(volume, 0), 100)
@@ -151,6 +160,10 @@ if __name__ == "__main__":
             res = send_message(command, url)
             print(res)
     except KeyboardInterrupt:
+        print("Quitting...")
+    finally:
+        send_message("clear")
+        stop_sox()
         GPIO.cleanup()
         print("\nGoodbye")
 

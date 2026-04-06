@@ -2,16 +2,7 @@ import pulsectl
 import subprocess
 import sys
 
-SINKS = {
-    'dac' : {
-        'label': 'HifiBerry DAC',
-        'sink': 'alsa_output.platform-soc_sound.stereo-fallback'
-    },
-    'builtin' : {
-        'label': 'Built-in speakers',
-        'sink': 'alsa_output.0.stereo-fallback'
-    }
-}
+from sinks import SINKS
 
 def get_source():
     sink = subprocess.check_output(['pactl', 'get-default-sink']).decode().strip()
