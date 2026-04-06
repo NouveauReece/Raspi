@@ -59,6 +59,7 @@ final class Coordinator: NSObject,
         didReceive message: WKScriptMessage
     ) {
         if message.name == "nfcScan" {
+            print("Received message 'nfcScan'")
             nfcBridge.startScan()
         }
     }
