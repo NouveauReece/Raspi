@@ -14,9 +14,6 @@ def get_source():
 def switch_to(sink_name):
     if sink_name in SINKS:
         subprocess.run(['pactl', 'set-default-sink', SINKS[sink_name]['sink']])
-        print(f"Switched to {SINKS[sink_name]['label']} (default updated)")
-    else:
-        print(f"Unknown sink: {sink_name}")
     
 def set_volume(sink, volume):
     sink_name = SINKS[sink]['sink']
@@ -25,7 +22,6 @@ def set_volume(sink, volume):
             if sink_obj.name == sink_name:
                 pulse.volume_set_all_chans(sink_obj, volume)
                 return
-        print(f"Sink {sink_name} not found")
 
 def get_volume(sink):
     sink_name = SINKS[sink]['sink']

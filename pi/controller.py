@@ -14,6 +14,7 @@ from sox import *
 from url import *
 from gpio import *
 from source import *
+from drfid import *
 
 # Mopidy Port
 PORT = 6680
@@ -116,15 +117,20 @@ if __name__ == "__main__":
         # set gpio callbacks
         GPIO_CALLBACK["switch_on"] = lambda: switch_to("dac")
         GPIO_CALLBACK["switch_off"] = lambda: switch_to("builtin")
+        GPIO_CALLBACK["drfid_tag_written"] = lambda: print('Written!')
         # set source to current switch value
-        switch_changed(None)
+        init_switch_state()
         
         while True:
-            command = input("\nEnter command: ").lower()
+            command = input("Enter command: ").lower()
             url = ""
         
             if command == "q":
                 break
+            elif command == "drfid_read":
+                drfid_str = drfid_read_string()
+                print("Read:", drfid_str)
+                continue
             elif command == "startup":
                 playsound("/home/raspi/sounds/startup.mp3")
                 continue
@@ -164,7 +170,7 @@ if __name__ == "__main__":
     finally:
         send_message("clear")
         stop_sox()
-        GPIO.cleanup()
+        cleanup_gpio()
         print("\nGoodbye")
 
 
