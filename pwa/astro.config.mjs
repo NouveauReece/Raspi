@@ -1,11 +1,12 @@
 // @ts-check
 import { defineConfig } from 'astro/config'
-import AstroPWA from '@vite-pwa/astro'
+import { VitePWA } from "vite-plugin-pwa";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [
-  AstroPWA({
+  vite: {
+    plugins: [
+      VitePWA({
       registerType: 'autoUpdate',
       manifest: {
         name: 'Raspi App',
@@ -21,4 +22,5 @@ export default defineConfig({
       workbox: { navigateFallback: '/404' }
     })
   ]
+  }
 })

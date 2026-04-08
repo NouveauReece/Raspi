@@ -15,6 +15,6 @@
     "astro": "^6.1.2"
   },
   "devDependencies": {
-    "@vite-pwa/astro": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0"
   }
 }
