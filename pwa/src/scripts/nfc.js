@@ -4,20 +4,16 @@ export async function scanNFC() {
     p.innerText = "returning scanWebNFC()";
     document.body.appendChild(p);
     return scanWebNFC()
-  }
-
-  if (window.NativeNFC) {
-    if ( window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nfcScan) {
-      const p = document.createElement('p');
-      p.innerText = "webkit and webkit.messageHandlers.nfcScan detected";
-      document.body.appendChild(p);
-      return window.webkit.messageHandlers.nfcScan.postMessage(null);
-    } else {
+  } else if ( window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nfcScan) {
+    const p = document.createElement('p');
+    p.innerText = "webkit and webkit.messageHandlers.nfcScan detected";
+    document.body.appendChild(p);
+    return window.webkit.messageHandlers.nfcScan.postMessage(null);
+  } else {
       const p = document.createElement('p');
       p.innerText = "nfcScan bridge not available";
       document.body.appendChild(p);
       console.log("nfcScan bridge not available");
-    }
   }
 
   throw new Error('NFC not supported')

@@ -13,7 +13,7 @@ struct ContentView: View {
     private let nfcBridge = NFCBridge()
 
     var body: some View {
-        WebView(url: URL(string: "http://raspipwa.reecen.dev/")!, nfcBridge: nfcBridge)
+        WebView(url: URL(string: "http://raspinonpwa.reecen.dev/")!, nfcBridge: nfcBridge)
             .webViewBackForwardNavigationGestures(.disabled)
             .scrollBounceBehavior(.basedOnSize, axes: [.vertical, .horizontal])
             .webViewLinkPreviews(.disabled)
