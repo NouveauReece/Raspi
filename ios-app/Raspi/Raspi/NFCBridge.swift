@@ -37,11 +37,14 @@ final class NFCBridge: NSObject, NFCNDEFReaderSessionDelegate {
             let record = messages.first?.records.first,
             let payload = String(data: record.payload, encoding: .utf8)
         else { return }
-
+        print("Payload: \(payload)")
+        print("Record: \(record)")
         let escaped = payload
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "'", with: "\\'")
 
+        print(escaped)
+        
         DispatchQueue.main.async {
             self.webView?.evaluateJavaScript(
                 "window.onNFCRead && window.onNFCRead('\(escaped)');"
