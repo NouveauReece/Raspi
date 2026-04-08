@@ -1,24 +1,21 @@
 ---
-import PWALayout from '../layouts/PWALayout.astro'
+import PWALayout from "../layouts/PWALayout.astro";
 ---
 
 <PWALayout title="Home">
-    <h1>Raspi!</h1>
-    <button>Scan NFC</button>
+	<h1>Raspi!</h1>
+	<button>Scan NFC</button>
 </PWALayout>
 
 <script>
-    import { scanNFC } from "../scripts/nfc";
-    document.querySelector('button')?.addEventListener('click', () => {
-        if (
-        window.webkit &&
-        window.webkit.messageHandlers &&
-        window.webkit.messageHandlers.nfcScan
-        ) {
-        window.webkit.messageHandlers.nfcScan.postMessage(null);
-        } else {
-        console.log("nfcScan bridge not available");
-        }
-    }
-)
+	import { scanNFC } from "../scripts/nfc";
+	document.querySelector("button")?.addEventListener("click", () => {
+		if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nfcScan) {
+			scanNFC();
+		} else {
+            const p = document.createElement('p');
+            p.innerText = "nfcScan bridge not available";
+            document.body.appendChild(p);
+		}
+	});
 </script>
