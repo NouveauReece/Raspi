@@ -1,5 +1,8 @@
 export async function scanNFC() {
   if ('NDEFReader' in window) {
+    const p = document.createElement('p');
+    p.innerText = "returning scanWebNFC()";
+    document.body.appendChild(p);
     return scanWebNFC()
   }
 
@@ -10,6 +13,9 @@ export async function scanNFC() {
       document.body.appendChild(p);
       return window.webkit.messageHandlers.nfcScan.postMessage(null);
     } else {
+      const p = document.createElement('p');
+      p.innerText = "nfcScan bridge not available";
+      document.body.appendChild(p);
       console.log("nfcScan bridge not available");
     }
   }
