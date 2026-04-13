@@ -9,6 +9,7 @@ soxes = []
 def start_sox(sink):
     sox = subprocess.Popen(['play', '-n', '-c2', 'synth', 'brownnoise', 'vol', '0'],
                            env={**os.environ, 'PULSE_SINK': SINKS[sink]['sink']},
+                           stdin=subprocess.DEVNULL,
                            stdout=subprocess.DEVNULL,
                            stderr=subprocess.DEVNULL)
     soxes.append(sox)

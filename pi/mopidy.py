@@ -2,6 +2,9 @@ import requests
 
 from url import *
 
+# Mopidy port
+PORT = 6680
+
 # Supported mopidy commands
 mopidy_commands = {
     "play" : "core.playback.play",

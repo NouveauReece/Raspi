@@ -7,9 +7,6 @@ from mopidy import *
 from source import *
 from sox import *
 
-# Mopidy port
-PORT = 6680
-
 def test_drfid_read():
     drfid_str = drfid_read_string()
     print("Read:", drfid_str)
@@ -57,7 +54,7 @@ if __name__ == "__main__":
         send_mopidy_message("clear")
 
         # play silent noise through speakers
-        # start_sox('dac')
+        start_sox('dac')
         
         # set default speaker volumes
         set_volume('dac', 0.3)
