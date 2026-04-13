@@ -1,110 +1,60 @@
-import RPi.GPIO as GPIO
-
-import re
-import os
-import sys
 import time
-import subprocess
-import requests
-import signal
-
 from playsound import playsound
 
-from sox import *
-from url import *
-from gpio import *
-from source import *
 from drfid import *
+from gpio import *
+from mopidy import *
+from source import *
+from sox import *
 
-# Mopidy Port
+# Mopidy port
 PORT = 6680
 
-# Supported commands
-commands = {
-    "play" : "core.playback.play",
-    "pause" : "core.playback.pause",
-    "next" : "core.playback.next",
-    "prev" : "core.playback.previous",
-    "stop" : "core.playback.stop",
-    "add" : "core.tracklist.add",
-    "clear" : "core.tracklist.clear",
-    "shuffle" : "core.tracklist.shuffle",
-    "mopidy_volume": "core.mixer.get_volume"
+def test_drfid_read():
+    drfid_str = drfid_read_string()
+    print("Read:", drfid_str)
+
+def test_startup():
+    playsound("/home/raspi/sounds/startup.mp3")
+
+def test_volume():
+    sink = get_source()
+    volume = float(get_volume(sink)) * 100
+    print(f"Volume: {volume}")
+
+def test_volume_set():
+    sink = get_source()
+    volume = int(input("Enter a value [0-100]: "))
+    volume = min(max(volume, 0), 100) / 100
+    set_volume(sink, volume)
+def test_source():
+    print(get_source())
+
+def test_switch():
+    sink = input("Enter sink [dac|builtin]: ")
+    switch_to(sink)
+
+
+# Terminal test commands
+test_commands = {
+    "drfid_read": test_drfid_read,
+    "startup": test_startup,
+    "volume": test_volume,
+    "volume_set": test_volume_set,
+    "source": test_source,
+    "switch": test_switch,
 }
-
-def make_request(method, params={}):
-    # Setup headers
-    headers = {
-        'Content-Type': 'application/json',
-    }
-    # Setup json_data
-    json_data = {
-        'jsonrpc' : '2.0',
-        'id' : 1,
-        'method' : method,
-        'params' : params,
-    }
-    # Mopidy post request
-    res = requests.post(f"http://localhost:{PORT}/mopidy/rpc", json=json_data, headers=headers)
-    return res
-
-def convert_spotify_url(url):
-    return f"spotify:{spotify_get_type(url)}:{spotify_get_id(url)}"
-
-def convert_youtube_url(url):
-    return f"youtube:{url}"
-
-def send_message(method, url=""):
-    spotify_uri = ""
-    params = {}
-    
-    # Check url to see if it is a valid sptofiy url
-    if method == "add" and url != "":
-        try:
-            mopidy_url = ""
-
-            if is_spotify_url(url):
-                mopidy_url = convert_spotify_url(url)
-            elif is_youtube_url(url):
-                mopidy_url = convert_youtube_url(url)
-            else:
-                print("Incorrect url format.")
-                return
-                
-            params["uris"] = [mopidy_url]
-        except ValueError as e:
-            print(str(e))
-            return
-    
-    # Make request
-    res = make_request(commands[method], params)
-    # User add a track and url was valid format but not a real spotify url
-    if url != "" and res.json()['result'] == []:
-        print("Something went wrong adding your url.\nThe url may be incorrect or you may not be connected to your music provider")
-        return
-    # User added a track and it was valid
-    return res.json()
-
-def get_playback_state():
-    # Request state from mopidy server
-    return make_request("core.playback.get_state").json()['result']
 
 if __name__ == "__main__":
     try:
         init_gpio()
         
         # Poll mopidy
-        while True:
-            print("\033[33mChecking connection\033[39m")
-            try:
-                time.sleep(1)
-                get_playback_state()
-                break
-            except Exception:
-                pass
+        while not is_mopidy_connected():
+            time.sleep(1)
 
         # clear current mopidy queue
-        send_message("clear")
+        send_mopidy_message("clear")
 
         # play silent noise through speakers
         # start_sox('dac')
@@ -112,65 +62,36 @@ if __name__ == "__main__":
         # set default speaker volumes
         set_volume('dac', 0.3)
         set_volume('builtin', 0.5)
-        make_request("core.mixer.set_volume", {"volume" : 50})
+        make_mopidy_request("core.mixer.set_volume", {"volume" : 50})
 
         # set gpio callbacks
         GPIO_CALLBACK["switch_on"] = lambda: switch_to("dac")
         GPIO_CALLBACK["switch_off"] = lambda: switch_to("builtin")
-        GPIO_CALLBACK["drfid_tag_written"] = lambda: print('Written!')
+
         # set source to current switch value
         init_switch_state()
         
         while True:
             command = input("Enter command: ").lower()
-            url = ""
-        
             if command == "q":
                 break
-            elif command == "drfid_read":
-                drfid_str = drfid_read_string()
-                print("Read:", drfid_str)
-                continue
-            elif command == "startup":
-                playsound("/home/raspi/sounds/startup.mp3")
-                continue
-            elif command == "mopidy_volume_set":
-                volume = int(input("Enter a value [0-100]: "))
-                volume = min(max(volume, 0), 100)
-                make_request("core.mixer.set_volume", {"volume" : volume})
-                continue
-            elif command == "volume":
-                sink = get_source()
-                volume = float(get_volume(sink)) * 100
-                print(f"Volume: {volume}")
-                continue
-            elif command == "volume_set":
-                sink = get_source()
-                volume = int(input("Enter a value [0-100]: "))
-                volume = min(max(volume, 0), 100) / 100
-                set_volume(sink, volume)
-                continue
-            elif command == "source":
-                print(get_source())
-                continue
-            elif command == "switch":
-                sink = input("Enter sink [dac|builtin]: ")
-                switch_to(sink)
-                continue
-            elif command == "add":
-                url = input("Enter url: ")
-            elif command not in commands:
+            elif command in test_commands:
+                test_commands[command]()
+            elif command in mopidy_commands:
+                param = None
+                if command == "add":
+                    param = input("Enter url: ")
+                elif command == "mopidy_volume_set":
+                    param = input("Enter a value [0-100]: ")
+                res = send_mopidy_message(command, param)
+                print(res)
+            else:
                 print("Not a valid command!")
                 continue
-            
-            res = send_message(command, url)
-            print(res)
     except KeyboardInterrupt:
         print("Quitting...")
     finally:
-        send_message("clear")
+        send_mopidy_message("clear")
         stop_sox()
         cleanup_gpio()
         print("\nGoodbye")
-
-
