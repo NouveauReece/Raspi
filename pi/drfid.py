@@ -1,5 +1,6 @@
 import smbus2
 import time
+import threading
 
 I2C_BUS = 1
 USER_ADDRESS = 0x53

@@ -4,6 +4,7 @@ from playsound import playsound
 from drfid import *
 from gpio import *
 from mopidy import *
+from rfid import *
 from source import *
 from sox import *
 
@@ -31,7 +32,6 @@ def test_switch():
     sink = input("Enter sink [dac|builtin]: ")
     switch_to(sink)
 
-
 # Terminal test commands
 test_commands = {
     "drfid_read": test_drfid_read,
@@ -41,6 +41,18 @@ test_commands = {
     "source": test_source,
     "switch": test_switch,
 }
+
+
+def drfid_written():
+    drfid_str = drfid_read_string()
+    print("DRFID:", drfid_str)
+    
+    if drfid_str == 'startup':
+        test_startup()
+
+def rfid_written(read):
+    print("RFID: " + read)
+
 
 if __name__ == "__main__":
     try:
@@ -67,6 +79,10 @@ if __name__ == "__main__":
 
         # set source to current switch value
         init_switch_state()
+
+        # start poll services
+        poll_for_drfid_write(drfid_written)
+        poll_for_rfid_write(rfid_written)
         
         while True:
             command = input("Enter command: ").lower()

@@ -1,6 +1,6 @@
 from mfrc522 import MFRC522
-import RPi.GPIO as GPIO
 import time
+import threading
 
 READ_BUF_LEN = 18
 EOF_CHARACTER = 254
