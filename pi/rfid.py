@@ -132,11 +132,8 @@ def rfid_read():
         if uid is None:
             continue
         
-        result = read_tag()
-        if result:
-            print("Read:", result)
-        
-        return
+        result = read_tag()        
+        return result
 
 def rfid_write(write_str):
     while True:        
@@ -151,6 +148,14 @@ def rfid_write(write_str):
             continue
         
         success = write_tag(write_str)
-        print("Write success:", success)
-        
         return
+
+
+def poll_for_rfid_write(callback, interval=1):
+    def _poll():
+        while True:
+            read = rfid_read()
+            callback(read)
+            time.sleep(interval)
+    t = threading.Thread(target=_poll, daemon=True)
+    t.start()

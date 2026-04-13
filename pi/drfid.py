@@ -48,3 +48,18 @@ def drfid_read_string(start=0x0011, length=256):
 def drfid_write_string(text, start=0x0000):
     data = [ord(c) for c in text] + [EOF_CHARACTER]
     write_user_memory(data, start)
+
+
+def poll_for_drfid_write(callback, interval=1):
+    def _poll():
+        while True:
+            try:
+                val = read_bytes(USER_ADDRESS, 0x2005, 1)[0]
+                if val & 0x02:
+                    callback()
+            except OSError:
+                pass
+            time.sleep(interval)
+            
+    t = threading.Thread(target=_poll, daemon=True)
+    t.start()
