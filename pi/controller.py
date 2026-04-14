@@ -76,15 +76,14 @@ if __name__ == "__main__":
             time.sleep(1)
 
         # clear current mopidy queue
-        send_mopidy_message("clear")
+        mopidy_clear()
 
         # play silent noise through speakers
         start_sox('builtin')
         
         # set default speaker volumes
-        set_volume('builtin', 0.5)
+        set_volume('builtin', 0.4)
         set_volume('aux', 0.5)
-        make_mopidy_request("core.mixer.set_volume", {"volume" : 50})
         switch_to('builtin')
         
         # set gpio callbacks
@@ -99,6 +98,7 @@ if __name__ == "__main__":
         # start poll services
         poll_for_drfid_write(drfid_written)
         poll_for_rfid_write(rfid_written)
+        poll_for_playback_state(mopidy_playback_callback)
         
         while True:
             command = input("Enter command: ").lower()
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Quitting...")
     finally:
-        send_mopidy_message("clear")
+        mopidy_clear()
         stop_sox()
         cleanup_gpio()
         print("\nGoodbye")

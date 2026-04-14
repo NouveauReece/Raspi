@@ -30,7 +30,7 @@ def get_source():
 def switch_to(sink_name):
     if sink_name in SINKS:
         subprocess.run(['pactl', 'set-default-sink', SINKS[sink_name]['sink']])
-        mopidy_set_volume(source_volume[sink_name]['current'])
+        mopidy_volume_set(source_volume[sink_name]['current'])
         set_volume(sink_name, source_volume[sink_name]['current']) # unnecessary but eh
 
 def toggle_source():

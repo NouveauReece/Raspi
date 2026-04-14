@@ -1,5 +1,8 @@
 import requests
+import threading
+import time
 
+from gpio import motor_spin, motor_stop
 from url import *
 
 # Mopidy port
@@ -19,7 +22,7 @@ def make_mopidy_request(method, params={}):
     }
     # Mopidy post request
     res = requests.post(f"http://localhost:{PORT}/mopidy/rpc", json=json_data, headers=headers)
-    return res
+    return res.json()['result']
 
 def convert_spotify_url(url):
     return f"spotify:{spotify_get_type(url)}:{spotify_get_id(url)}"
@@ -56,7 +59,7 @@ def send_mopidy_message(method, param=None):
     if param != None and res.json()['result'] == []:
         print("Something went wrong...")
         return
-    return res.json()
+    return res
 
 def mopidy_play():
     return make_mopidy_request("core.playback.play")
@@ -87,28 +90,30 @@ def mopidy_clear():
 def mopidy_shuffle():
     return make_mopidy_request("core.tracklist.shuffle")
 def mopidy_volume():
-    return make_mopidy_request("core.mixer.get_volume").json()['result']
+    return make_mopidy_request("core.mixer.get_volume")
 def mopidy_volume_set(volume):
-    volume = min(100, max(0, volume * 100))
+    volume = int(min(100, max(0, volume * 100)))
     return make_mopidy_request("core.mixer.set_volume", {"volume" : volume})
 def mopidy_playback():
-    return make_mopidy_request("core.playback.get_state").json()['result']
+    return make_mopidy_request("core.playback.get_state")
 
 
 def mopidy_toggle_playback():
     state = mopidy_playback()
-    # Switch state to play or pause
     if state == "playing":
         mopidy_pause()
+        motor_stop()
     else:
         mopidy_play()
+        motor_spin()
     
 def is_mopidy_connected():
     print("\033[33mChecking connection\033[39m")
     try:
         mopidy_playback()
+        print("\033[32mConnected!\033[39m")
         return True
-    except Exception:
+    except Exception as e:
         return False
 
 
