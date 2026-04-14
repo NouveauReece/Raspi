@@ -29,7 +29,7 @@ def test_source():
     print(get_source())
 
 def test_switch():
-    sink = input("Enter sink [dac|builtin]: ")
+    sink = input("Enter sink [builtin|aux]: ")
     switch_to(sink)
 
 def test_motor_spin():
@@ -79,19 +79,22 @@ if __name__ == "__main__":
         send_mopidy_message("clear")
 
         # play silent noise through speakers
-        start_sox('dac')
+        start_sox('builtin')
         
         # set default speaker volumes
-        set_volume('dac', 0.5)
         set_volume('builtin', 0.5)
+        set_volume('aux', 0.5)
         make_mopidy_request("core.mixer.set_volume", {"volume" : 50})
-
+        switch_to('builtin')
+        
         # set gpio callbacks
-        GPIO_CALLBACK["source"] = lambda: print("set")
-        # GPIO_CALLBACK["switch_off"] = lambda: switch_to("builtin")
-
-        # # set source to current switch value
-        # init_switch_state()
+        GPIO_CALLBACK["source"] = toggle_source
+        GPIO_CALLBACK["shuffle"] = mopidy_shuffle
+        GPIO_CALLBACK["volume_up"] = lambda: volume_change(True)
+        GPIO_CALLBACK["volume_dn"] = lambda: volume_change(False)
+        GPIO_CALLBACK["prev"] = mopidy_prev
+        GPIO_CALLBACK["play"] = mopidy_toggle_playback
+        GPIO_CALLBACK["next"] = mopidy_next
 
         # start poll services
         poll_for_drfid_write(drfid_written)
@@ -104,12 +107,14 @@ if __name__ == "__main__":
             elif command in test_commands:
                 test_commands[command]()
             elif command in mopidy_commands:
-                param = None
                 if command == "add":
-                    param = input("Enter url: ")
+                    url = input("Enter url: ")
+                    res = mopidy_commands["add"](url)
                 elif command == "mopidy_volume_set":
-                    param = input("Enter a value [0-100]: ")
-                res = send_mopidy_message(command, param)
+                    volume = int(input("Enter a value [0-100]: ")) / 100
+                    res = mopidy_commands["mopidy_volume_set"](volume)
+                else:
+                    res = mopidy_commands[command]()
                 print(res)
             else:
                 print("Not a valid command!")

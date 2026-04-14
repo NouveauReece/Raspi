@@ -5,20 +5,6 @@ from url import *
 # Mopidy port
 PORT = 6680
 
-# Supported mopidy commands
-mopidy_commands = {
-    "play" : "core.playback.play",
-    "pause" : "core.playback.pause",
-    "next" : "core.playback.next",
-    "prev" : "core.playback.previous",
-    "stop" : "core.playback.stop",
-    "add" : "core.tracklist.add",
-    "clear" : "core.tracklist.clear",
-    "shuffle" : "core.tracklist.shuffle",
-    "mopidy_volume": "core.mixer.get_volume",
-    "mopidy_volume_set": "core.mixer.set_volume",
-}
-
 def make_mopidy_request(method, params={}):
     # Setup headers
     headers = {
@@ -72,15 +58,55 @@ def send_mopidy_message(method, param=None):
         return
     return res.json()
 
-def get_playback_state():
-    # Request state from mopidy server
+def mopidy_play():
+    return make_mopidy_request("core.playback.play")
+def mopidy_pause():
+    return make_mopidy_request("core.playback.pause")
+def mopidy_next():
+    return make_mopidy_request("core.playback.next")
+def mopidy_prev():
+    return make_mopidy_request("core.playback.prev")
+def mopidy_stop():
+    return make_mopidy_request("core.playback.stop")
+def mopidy_add(url):
+    mopidy_url = ""
+    try:    
+        if is_spotify_url(url):
+            mopidy_url = convert_spotify_url(url)
+        elif is_youtube_url(url):
+            mopidy_url = convert_youtube_url(url)
+        else:
+            print("Incorrect url format.")
+            return
+    except ValueError as e:
+        print(str(e))
+        return
+    return make_mopidy_request("core.tracklist.add", {"uris" : [mopidy_url]})
+def mopidy_clear():
+    return make_mopidy_request("core.tracklist.clear")
+def mopidy_shuffle():
+    return make_mopidy_request("core.tracklist.shuffle")
+def mopidy_volume():
+    return make_mopidy_request("core.mixer.get_volume").json()['result']
+def mopidy_volume_set(volume):
+    volume = min(100, max(0, volume * 100))
+    return make_mopidy_request("core.mixer.set_volume", {"volume" : volume})
+def mopidy_playback():
     return make_mopidy_request("core.playback.get_state").json()['result']
 
 
+def mopidy_toggle_playback():
+    state = mopidy_playback()
+    # Switch state to play or pause
+    if state == "playing":
+        mopidy_pause()
+    else:
+        mopidy_play()
+    
 def is_mopidy_connected():
     print("\033[33mChecking connection\033[39m")
     try:
-        get_playback_state()
+        mopidy_playback()
         return True
     except Exception:
         return False
@@ -89,8 +115,23 @@ def is_mopidy_connected():
 def poll_for_playback_state(callback, interval=5):
     def _poll():
         while True:
-            callback(get_playback_state())
+            callback(mopidy_playback())
             time.sleep(interval)
             
     t = threading.Thread(target=_poll, daemon=True)
     t.start()
+
+
+# Supported mopidy commands
+mopidy_commands = {
+    "play" : mopidy_play,
+    "pause" : mopidy_pause,
+    "next" : mopidy_next,
+    "prev" : mopidy_prev,
+    "stop" : mopidy_stop,
+    "add" : mopidy_add,
+    "clear" : mopidy_clear,
+    "shuffle" : mopidy_shuffle,
+    "mopidy_volume": mopidy_volume,
+    "mopidy_volume_set": mopidy_volume_set,
+}
