@@ -32,6 +32,12 @@ def test_switch():
     sink = input("Enter sink [dac|builtin]: ")
     switch_to(sink)
 
+def test_motor_spin():
+    motor_spin()
+
+def test_motor_stop():
+    motor_stop()
+    
 # Terminal test commands
 test_commands = {
     "drfid_read": test_drfid_read,
@@ -40,6 +46,8 @@ test_commands = {
     "volume_set": test_volume_set,
     "source": test_source,
     "switch": test_switch,
+    "motor_spin": test_motor_spin,
+    "motor_stop": test_motor_stop,
 }
 
 
@@ -53,7 +61,12 @@ def drfid_written():
 def rfid_written(read):
     print("RFID: " + read)
 
-
+def mopidy_playback_callback(state):
+    if state == 'playing':
+        motor_spin()
+    else:
+        motor_stop()
+    
 if __name__ == "__main__":
     try:
         init_gpio()
@@ -77,8 +90,8 @@ if __name__ == "__main__":
         GPIO_CALLBACK["switch_on"] = lambda: switch_to("dac")
         GPIO_CALLBACK["switch_off"] = lambda: switch_to("builtin")
 
-        # set source to current switch value
-        init_switch_state()
+        # # set source to current switch value
+        # init_switch_state()
 
         # start poll services
         poll_for_drfid_write(drfid_written)

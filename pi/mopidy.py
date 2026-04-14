@@ -85,3 +85,12 @@ def is_mopidy_connected():
     except Exception:
         return False
 
+
+def poll_for_playback_state(callback, interval=5):
+    def _poll():
+        while True:
+            callback(get_playback_state())
+            time.sleep(interval)
+            
+    t = threading.Thread(target=_poll, daemon=True)
+    t.start()
