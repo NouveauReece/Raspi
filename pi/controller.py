@@ -82,13 +82,13 @@ if __name__ == "__main__":
         start_sox('dac')
         
         # set default speaker volumes
-        set_volume('dac', 0.3)
+        set_volume('dac', 0.5)
         set_volume('builtin', 0.5)
         make_mopidy_request("core.mixer.set_volume", {"volume" : 50})
 
         # set gpio callbacks
-        GPIO_CALLBACK["switch_on"] = lambda: switch_to("dac")
-        GPIO_CALLBACK["switch_off"] = lambda: switch_to("builtin")
+        GPIO_CALLBACK["source"] = lambda: print("set")
+        # GPIO_CALLBACK["switch_off"] = lambda: switch_to("builtin")
 
         # # set source to current switch value
         # init_switch_state()
