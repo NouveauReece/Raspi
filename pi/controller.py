@@ -1,3 +1,4 @@
+from datetime import datetime
 import time
 
 from audioctl import *
@@ -56,9 +57,23 @@ def drfid_written():
     if drfid_str == 'startup':
         test_startup()
 
+current_rfid = {
+    "uid": None,
+    "url": None,
+    "time": None
+}
 def rfid_written(uid, read):
-    print("UID: " + uid)
-    print("RFID: " + read)
+    global current_rfid
+
+    if current_rfid["uid"] == uid and current_rfid["url"] == read:
+        print((datetime.now() - current_rfid["time"]).total_seconds())
+        current_rfid["time"] = datetime.now()
+    else:
+        current_rfid["uid"] = uid
+        current_rfid["url"] = read
+        current_rfid["time"] = datetime.now()
+        print("UID: " + str(uid))
+        print("RFID: " + read)
 
 def mopidy_playback_callback(state):
     if state == 'playing':
@@ -97,7 +112,7 @@ if __name__ == "__main__":
         # start poll services
         poll_for_drfid_write(drfid_written)
         poll_for_rfid_write(rfid_written)
-        poll_for_playback_state(mopidy_playback_callback)
+        # poll_for_playback_state(mopidy_playback_callback)
         
         while True:
             command = input("Enter command: ").lower()
