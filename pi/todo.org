@@ -1,0 +1,7 @@
+* TODO Device Software
+** TODO Scripts runs on startup
+*** TODO Setup systemd service
+** TODO RFID reads urls and plays them
+*** TODO Handle reading tag multiple times without constantly clearing playback
+** TODO DRFID reads commands and responds
+** TODO Neopixel strip provides system status

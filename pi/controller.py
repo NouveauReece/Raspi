@@ -1,12 +1,10 @@
 import time
-from playsound import playsound
 
+from audioctl import *
 from drfid import *
 from gpio import *
 from mopidy import *
 from rfid import *
-from source import *
-from sox import *
 
 def test_drfid_read():
     drfid_str = drfid_read_string()
@@ -58,7 +56,8 @@ def drfid_written():
     if drfid_str == 'startup':
         test_startup()
 
-def rfid_written(read):
+def rfid_written(uid, read):
+    print("UID: " + uid)
     print("RFID: " + read)
 
 def mopidy_playback_callback(state):

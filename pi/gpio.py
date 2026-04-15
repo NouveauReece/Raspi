@@ -17,14 +17,17 @@ IN1_PIN = 6
 
 GPIO_DEVICES = {}
 
+def _gpio_not_set(pin):
+    return lambda: print(f"GPIO pin {pin} callback not set")
+
 GPIO_CALLBACK = {
-    "source": (lambda: print("unset")),
-    "shuffle": (lambda: None),
-    "volume_up": (lambda: None),
-    "volume_dn": (lambda: None),
-    "prev": (lambda: None),
-    "play": (lambda: None),
-    "next": (lambda: None),
+    "source": _gpio_not_set("source"),
+    "shuffle": _gpio_not_set("shuffle"),
+    "volume_up": _gpio_not_set("volume_up"),
+    "volume_dn": _gpio_not_set("volume_dn"),
+    "prev": _gpio_not_set("prev"),
+    "play": _gpio_not_set("play"),
+    "next": _gpio_not_set("next"),
 }
 
 def init_gpio():
