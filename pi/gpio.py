@@ -1,4 +1,4 @@
-from gpiozero import Button, Device, OutputDevice
+from gpiozero import Button, Device, OutputDevice, RotaryEncoder
 from gpiozero.pins.lgpio import LGPIOFactory
 
 Device.pin_factory = LGPIOFactory()
@@ -33,18 +33,16 @@ GPIO_CALLBACK = {
 def init_gpio():
     source_btn = Button(SOURCE_PIN, pull_up=True, bounce_time=0.05)
     shuffle_btn = Button(SHUFFLE_PIN, pull_up=True, bounce_time=0.05)
-    volume_up_btn = Button(VOLUME_UP_PIN, pull_up=True, bounce_time=0.05)
-    volume_dn_btn = Button(VOLUME_DN_PIN, pull_up=True, bounce_time=0.05)
     prev_btn = Button(PREV_PIN, pull_up=True, bounce_time=0.05)
     play_btn = Button(PLAY_PIN, pull_up=True, bounce_time=0.05)
     next_btn = Button(NEXT_PIN, pull_up=True, bounce_time=0.05)
-
+    volume = RotaryEncoder(VOLUME_UP_PIN, VOLUME_DN_PIN)
     motor = OutputDevice(IN1_PIN)
 
     source_btn.when_pressed = lambda: GPIO_CALLBACK["source"]()
     shuffle_btn.when_pressed = lambda: GPIO_CALLBACK["shuffle"]()
-    volume_up_btn.when_pressed = lambda: GPIO_CALLBACK["volume_up"]()
-    volume_dn_btn.when_pressed = lambda: GPIO_CALLBACK["volume_dn"]()
+    volume.when_rotated_clockwise = lambda: GPIO_CALLBACK["volume_up"]()
+    volume.when_rotated_counter_clockwise = lambda: GPIO_CALLBACK["volume_dn"]()
     prev_btn.when_pressed = lambda: GPIO_CALLBACK["prev"]()
     play_btn.when_pressed = lambda: GPIO_CALLBACK["play"]()
     next_btn.when_pressed = lambda: GPIO_CALLBACK["next"]()
