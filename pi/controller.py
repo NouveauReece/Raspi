@@ -12,7 +12,7 @@ def test_drfid_read():
     print("Read:", drfid_str)
 
 def test_startup():
-    playsound("/home/raspi/sounds/startup.mp3")
+    play_sound("/home/raspi/sounds/startup.mp3", "builtin")
 
 def test_volume():
     sink = get_source()
@@ -101,7 +101,8 @@ if __name__ == "__main__":
         switch_to('builtin')
         
         # set gpio callbacks
-        GPIO_CALLBACK["source"] = toggle_source
+        GPIO_CALLBACK["source_on"] = lambda: switch_to("builtin")
+        GPIO_CALLBACK["source_off"] = lambda: switch_to("aux")
         GPIO_CALLBACK["shuffle"] = mopidy_shuffle
         GPIO_CALLBACK["volume_up"] = lambda: volume_change(True)
         GPIO_CALLBACK["volume_dn"] = lambda: volume_change(False)
@@ -109,6 +110,8 @@ if __name__ == "__main__":
         GPIO_CALLBACK["play"] = mopidy_toggle_playback
         GPIO_CALLBACK["next"] = mopidy_next
 
+        init_switch_state()
+        
         # start poll services
         poll_for_drfid_write(drfid_written)
         poll_for_rfid_write(rfid_written)

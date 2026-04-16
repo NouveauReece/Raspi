@@ -21,7 +21,8 @@ def _gpio_not_set(pin):
     return lambda: print(f"GPIO pin {pin} callback not set")
 
 GPIO_CALLBACK = {
-    "source": _gpio_not_set("source"),
+    "source_on": _gpio_not_set("source_on"),
+    "source_off": _gpio_not_set("source_off"),
     "shuffle": _gpio_not_set("shuffle"),
     "volume_up": _gpio_not_set("volume_up"),
     "volume_dn": _gpio_not_set("volume_dn"),
@@ -36,10 +37,11 @@ def init_gpio():
     prev_btn = Button(PREV_PIN, pull_up=True, bounce_time=0.05)
     play_btn = Button(PLAY_PIN, pull_up=True, bounce_time=0.05)
     next_btn = Button(NEXT_PIN, pull_up=True, bounce_time=0.05)
-    volume = RotaryEncoder(VOLUME_UP_PIN, VOLUME_DN_PIN)
+    volume = RotaryEncoder(VOLUME_DN_PIN, VOLUME_UP_PIN)
     motor = OutputDevice(IN1_PIN)
 
-    source_btn.when_pressed = lambda: GPIO_CALLBACK["source"]()
+    source_btn.when_pressed = lambda: GPIO_CALLBACK["source_on"]()
+    source_btn.when_released = lambda: GPIO_CALLBACK["source_off"]()
     shuffle_btn.when_pressed = lambda: GPIO_CALLBACK["shuffle"]()
     volume.when_rotated_clockwise = lambda: GPIO_CALLBACK["volume_up"]()
     volume.when_rotated_counter_clockwise = lambda: GPIO_CALLBACK["volume_dn"]()
@@ -47,16 +49,11 @@ def init_gpio():
     play_btn.when_pressed = lambda: GPIO_CALLBACK["play"]()
     next_btn.when_pressed = lambda: GPIO_CALLBACK["next"]()
     
-    # switch.when_pressed = switch_on
-    # switch.when_released = switch_off
-
-    # motor = Motor(forward=IN1_PIN, backward=IN2_PIN, enable=ENA_PIN, pwm=True)
     motor.off()
 
     GPIO_DEVICES["source"] = source_btn
     GPIO_DEVICES["shuffle"] = shuffle_btn
-    GPIO_DEVICES["volume_up"] = volume_up_btn
-    GPIO_DEVICES["volume_dn"] = volume_dn_btn
+    GPIO_DEVICES["volume"] = volume
     GPIO_DEVICES["prev"] = prev_btn
     GPIO_DEVICES["play"] = play_btn
     GPIO_DEVICES["next"] = next_btn
@@ -69,6 +66,12 @@ def cleanup_gpio():
 
     for dev in GPIO_DEVICES:
         GPIO_DEVICES[dev].close()
+
+def init_switch_state():
+    if GPIO_DEVICES["source"].is_pressed:
+        GPIO_CALLBACK["source_on"]()
+    else:
+        GPIO_CALLBACK["source_off"]()
         
 def motor_spin():
     GPIO_DEVICES["motor"].on()
