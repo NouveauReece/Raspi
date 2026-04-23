@@ -12,6 +12,7 @@ struct WebView: UIViewRepresentable {
 
     let url: URL
     let nfcBridge: NFCBridge
+    let nfcReader: NFCReader
 
     func makeUIView(context: Context) -> WKWebView {
 
@@ -39,7 +40,7 @@ struct WebView: UIViewRepresentable {
     func updateUIView(_ webView: WKWebView, context: Context) {}
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(nfcBridge: nfcBridge)
+        Coordinator(nfcBridge: nfcBridge, reader: nfcReader)
     }
 }
 
@@ -48,9 +49,11 @@ final class Coordinator: NSObject,
                          WKNavigationDelegate {
 
     let nfcBridge: NFCBridge
+    let nfcReader: NFCReader
 
-    init(nfcBridge: NFCBridge) {
+    init(nfcBridge: NFCBridge, reader: NFCReader) {
         self.nfcBridge = nfcBridge
+        self.nfcReader = reader
     }
 
     // JavaScript → Native
@@ -60,7 +63,8 @@ final class Coordinator: NSObject,
     ) {
         if message.name == "nfcScan" {
             print("Received message 'nfcScan'")
-            nfcBridge.startScan()
+//            nfcBridge.startScan()
+            nfcReader.read()
         }
     }
 }

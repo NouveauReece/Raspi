@@ -10,15 +10,12 @@ import PWALayout from "../layouts/PWALayout.astro";
 <script>
 	import { scanNFC } from "../scripts/nfc";
 	document.querySelector("button")?.addEventListener("click", () => {
-		if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nfcScan) {
-            const p = document.createElement('p');
-            p.innerText = "webkit and webkit.messageHandlers.nfcScan detected";
-            document.body.appendChild(p);
-			scanNFC();
-		} else {
-            const p = document.createElement('p');
-            p.innerText = "nfcScan bridge not available";
-            document.body.appendChild(p);
-		}
+        scanNFC();
 	});
+
+	function onNFCRead(value) {
+		const p = document.createElement('p');
+		p.innerText = value;
+		document.body.appendChild(p);
+	}
 </script>
