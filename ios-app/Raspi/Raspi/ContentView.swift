@@ -10,11 +10,17 @@ import WebKit
 
 struct ContentView: View {
     
-    private let nfcBridge = NFCBridge()
-    private let nfcReader = NFCReader()
+    private let webView: WKWebView = {
+        let contentController = WKUserContentController()
+        let config = WKWebViewConfiguration()
+        config.userContentController = contentController
+        return WKWebView(frame: .zero, configuration: config)
+    }()
+    
+    private var nfcReader: NFCReader { NFCReader(wv: webView) }
 
     var body: some View {
-        WebView(url: URL(string: "http://raspinonpwa.reecen.dev/")!, nfcBridge: nfcBridge, nfcReader: nfcReader)
+        WebView(webView: self.webView, url: URL(string: "http://raspinonpwa.reecen.dev/")!, nfcReader: nfcReader)
             .webViewBackForwardNavigationGestures(.disabled)
             .scrollBounceBehavior(.basedOnSize, axes: [.vertical, .horizontal])
             .webViewLinkPreviews(.disabled)

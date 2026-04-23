@@ -9,30 +9,16 @@ import SwiftUI
 import WebKit
 
 struct WebView: UIViewRepresentable {
-
+    
+    let webView: WKWebView
     let url: URL
-    let nfcBridge: NFCBridge
     let nfcReader: NFCReader
 
     func makeUIView(context: Context) -> WKWebView {
-
-        let contentController = WKUserContentController()
-
-        // JS → Native
-        contentController.add(
-            context.coordinator,
-            name: "nfcScan"
-        )
-
-        let config = WKWebViewConfiguration()
-        config.userContentController = contentController
-
-        let webView = WKWebView(frame: .zero, configuration: config)
+        
+        webView.configuration.userContentController.add(context.coordinator, name: "nfcScan")
         webView.navigationDelegate = context.coordinator
-
-        // Native → JS
-        nfcBridge.webView = webView
-
+        nfcReader.webView = webView
         webView.load(URLRequest(url: url))
         return webView
     }
@@ -40,7 +26,7 @@ struct WebView: UIViewRepresentable {
     func updateUIView(_ webView: WKWebView, context: Context) {}
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(nfcBridge: nfcBridge, reader: nfcReader)
+        Coordinator(reader: nfcReader)
     }
 }
 
@@ -48,11 +34,9 @@ final class Coordinator: NSObject,
                          WKScriptMessageHandler,
                          WKNavigationDelegate {
 
-    let nfcBridge: NFCBridge
     let nfcReader: NFCReader
 
-    init(nfcBridge: NFCBridge, reader: NFCReader) {
-        self.nfcBridge = nfcBridge
+    init(reader: NFCReader) {
         self.nfcReader = reader
     }
 

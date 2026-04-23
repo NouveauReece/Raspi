@@ -9,52 +9,52 @@ import Foundation
 import CoreNFC
 import WebKit
 
-final class NFCBridge: NSObject, NFCNDEFReaderSessionDelegate {
-
-    weak var webView: WKWebView?
-    private var session: NFCNDEFReaderSession?
-
-    func startScan() {
-        guard NFCNDEFReaderSession.readingAvailable else {
-            print("NFC not available")
-            return
-        }
-
-        session = NFCNDEFReaderSession(
-            delegate: self,
-            queue: nil,
-            invalidateAfterFirstRead: true
-        )
-        session?.alertMessage = "Hold your iPhone near the Record Player"
-        session?.begin()
-    }
-
-    func readerSession(
-        _ session: NFCNDEFReaderSession,
-        didDetectNDEFs messages: [NFCNDEFMessage]
-    ) {
-        guard
-            let record = messages.first?.records.first,
-            let payload = String(data: record.payload, encoding: .utf8)
-        else { return }
-        print("Payload: \(payload)")
-        print("Record: \(record)")
-        let escaped = payload
-            .replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "'", with: "\\'")
-
-        print(escaped)
-        
-        DispatchQueue.main.async {
-            self.webView?.evaluateJavaScript(
-                "window.onNFCRead && window.onNFCRead('\(escaped)');"
-            )
-        }
-    }
-
-    func readerSession(_ session: NFCNDEFReaderSession,
-                       didInvalidateWithError error: Error) {
-        print("NFC error:", error)
-        self.session = nil
-    }
-}
+//final class NFCBridge: NSObject, NFCNDEFReaderSessionDelegate {
+//
+//    weak var webView: WKWebView?
+//    private var session: NFCNDEFReaderSession?
+//
+//    func startScan() {
+//        guard NFCNDEFReaderSession.readingAvailable else {
+//            print("NFC not available")
+//            return
+//        }
+//
+//        session = NFCNDEFReaderSession(
+//            delegate: self,
+//            queue: nil,
+//            invalidateAfterFirstRead: true
+//        )
+//        session?.alertMessage = "Hold your iPhone near the Record Player"
+//        session?.begin()
+//    }
+//
+//    func readerSession(
+//        _ session: NFCNDEFReaderSession,
+//        didDetectNDEFs messages: [NFCNDEFMessage]
+//    ) {
+//        guard
+//            let record = messages.first?.records.first,
+//            let payload = String(data: record.payload, encoding: .utf8)
+//        else { return }
+//        print("Payload: \(payload)")
+//        print("Record: \(record)")
+//        let escaped = payload
+//            .replacingOccurrences(of: "\\", with: "\\\\")
+//            .replacingOccurrences(of: "'", with: "\\'")
+//
+//        print(escaped)
+//        
+//        DispatchQueue.main.async {
+//            self.webView?.evaluateJavaScript(
+//                "window.onNFCRead && window.onNFCRead('\(escaped)');"
+//            )
+//        }
+//    }
+//
+//    func readerSession(_ session: NFCNDEFReaderSession,
+//                       didInvalidateWithError error: Error) {
+//        print("NFC error:", error)
+//        self.session = nil
+//    }
+//}

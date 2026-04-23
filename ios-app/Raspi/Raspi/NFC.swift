@@ -13,12 +13,16 @@ public import Combine
 @available(iOS 15.0, *)
 public class NFCReader: NSObject, ObservableObject, NFCNDEFReaderSessionDelegate {
 
-    weak var webView: WKWebView?
+    var webView: WKWebView
     
     @Published public var startAlert = "Hold your iPhone near the tag."
     @Published public var endAlert = ""
     @Published public var msg = "Scan to read or Edit here to write..."
     @Published public var raw =  "Raw Data available after scan."
+    
+    init(wv: WKWebView) {
+        self.webView = wv
+    }
 
     public var session: NFCNDEFReaderSession?
     
@@ -49,7 +53,13 @@ public class NFCReader: NSObject, ObservableObject, NFCNDEFReaderSessionDelegate
 
             session.alertMessage = self.endAlert != "" ? self.endAlert : "Read \(messages.count) NDEF Messages, and \(messages[0].records.count) Records."
             
-            self.webView?.evaluateJavaScript("window.onNFCRead && window.onNFCRead('\(self.msg)');")
+            let js = "const p = document.createElement('p'); p.innerText = \"\(self.msg)\"; document.body.appendChild(p);"
+            
+            print("evaluating:\n\(js)")
+            
+            self.webView.evaluateJavaScript(js) { _, error in
+                if let error { print("JS error: \(error)") }
+            }
         }
     }
     

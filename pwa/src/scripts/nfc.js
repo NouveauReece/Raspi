@@ -37,3 +37,11 @@ export async function scanWebNFC() {
 }
 
 
+// Called when NFC Data Received
+export async function nfcDidScan(data) {
+  const p = document.createElement('p');
+  p.innerText = data;
+  document.body.appendChild(p);
+}
+
+

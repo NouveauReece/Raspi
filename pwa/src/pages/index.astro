@@ -8,14 +8,9 @@ import PWALayout from "../layouts/PWALayout.astro";
 </PWALayout>
 
 <script>
-	import { scanNFC } from "../scripts/nfc";
+	import { scanNFC, nfcDidScan } from "../scripts/nfc";
 	document.querySelector("button")?.addEventListener("click", () => {
         scanNFC();
 	});
-
-	window.onNFCRead = (data) => {
-		const p = document.createElement('p');
-		p.innerText = data;
-		document.body.appendChild(p);
-	}
+	
 </script>
