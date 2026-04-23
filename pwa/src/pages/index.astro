@@ -13,9 +13,9 @@ import PWALayout from "../layouts/PWALayout.astro";
         scanNFC();
 	});
 
-	function onNFCRead(value) {
+	window.onNFCRead = (data) => {
 		const p = document.createElement('p');
-		p.innerText = value;
+		p.innerText = data;
 		document.body.appendChild(p);
 	}
 </script>
