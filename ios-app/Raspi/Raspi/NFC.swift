@@ -53,7 +53,7 @@ public class NFCReader: NSObject, ObservableObject, NFCNDEFReaderSessionDelegate
 
             session.alertMessage = self.endAlert != "" ? self.endAlert : "Read \(messages.count) NDEF Messages, and \(messages[0].records.count) Records."
             
-            let js = "const p = document.createElement('p'); p.innerText = \"\(self.msg)\"; document.body.appendChild(p);"
+            let js = "window.dispatchEvent(new CustomEvent('nfcDidScan', { detail: \"\(self.msg)\" }))"
             
             print("evaluating:\n\(js)")
             

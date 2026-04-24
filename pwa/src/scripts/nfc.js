@@ -1,3 +1,9 @@
+export async function setup() {
+  window.addEventListener("nfcDidScan", e => { nfcDidScan(e) });
+  
+}
+
+
 export async function scanNFC() {
   if ('NDEFReader' in window) {
     const p = document.createElement('p');
