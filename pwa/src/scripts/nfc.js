@@ -15,7 +15,7 @@ export async function setup() {
   document.querySelector("[data-nfc-scan]")?.addEventListener("click", () => { readNFC(); });
 
   // NFC Write
-  document.querySelector("[data-nfc-scan]")?.addEventListener("click", (e) => { 
+  document.querySelector("[data-nfc-write]")?.addEventListener("click", (e) => { 
     writeNFC(
       document.querySelector(`#${e.target.getAttribute('data-type-from')}`),
       document.querySelector(`#${e.target.getAttribute('data-payload-from')}`)
