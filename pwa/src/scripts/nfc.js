@@ -1,53 +1,88 @@
 export async function setup() {
-  window.addEventListener("nfcDidScan", e => { nfcDidScan(e) });
-  
+	window.addEventListener("nfcDidScan", (e) => {
+		display(`Read result: ${e.detail}`);
+	});
+
+	window.addEventListener("nfcWriteSuccess", (e) => {
+		display(`Wrote successfully: ${e.detail}`);
+	});
+
+	window.addEventListener("nfcWriteError", (e) => {
+		display(`Write error: ${e.detail}`);
+	});
+
+  // NFC Read
+  document.querySelector("[data-nfc-scan]")?.addEventListener("click", () => { readNFC(); });
+
+  // NFC Write
+  document.querySelector("[data-nfc-scan]")?.addEventListener("click", (e) => { 
+    writeNFC(
+      document.querySelector(`#${e.target.getAttribute('data-type-from')}`),
+      document.querySelector(`#${e.target.getAttribute('data-payload-from')}`)
+    ) 
+  });
+
 }
 
+/**
+ * Displays the content in a <p> tag and appends it to <body>
+ * @param {string} content - The text to display
+ */
+export function display(content) {
+	const p = document.createElement("p");
+	p.innerText = content;
+	document.body.appendChild(p);
+}
 
-export async function scanNFC() {
-  if ('NDEFReader' in window) {
-    const p = document.createElement('p');
-    p.innerText = "returning scanWebNFC()";
-    document.body.appendChild(p);
-    return scanWebNFC()
-  } else if ( window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nfcScan) {
-    const p = document.createElement('p');
-    p.innerText = "webkit and webkit.messageHandlers.nfcScan detected";
-    document.body.appendChild(p);
-    return window.webkit.messageHandlers.nfcScan.postMessage(null);
-  } else {
-      const p = document.createElement('p');
-      p.innerText = "nfcScan bridge not available";
-      document.body.appendChild(p);
-      console.log("nfcScan bridge not available");
-  }
+/**
+ * Reads an NFC Tag
+ */
+export async function readNFC() {
+  
+	if ("NDEFReader" in window) {
+    // Supports webNFC
+		display("returning scanWebNFC()");
+		return scanWebNFC();
 
-  throw new Error('NFC not supported')
+	} else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nfcScan) {
+    // if iOS App
+		display("webkit and webkit.messageHandlers.nfcScan detected");
+		return window.webkit.messageHandlers.nfcScan.postMessage(null);
+
+	} else {
+    // Unavailable
+		display("nfcScan bridge not available");
+	}
+
+  display("NFC not supported");
+	throw new Error("NFC not supported");
 }
 
 export async function scanWebNFC() {
-  const reader = new NDEFReader()
-  const p = document.createElement('p');
-  p.innerText = "scanWebNFC() running...";
-  document.body.appendChild(p);
-  await reader.scan()
+  display("scanWebNFC() running...");
+	const reader = new NDEFReader();
+	await reader.scan();
 
-  return new Promise(resolve => {
-    reader.onreading = event => {
-      const p = document.createElement('p');
-      p.innerText = event.message.records;
-      document.body.appendChild(p);
-      resolve(event.message.records);
-    }
-  })
+	return new Promise((resolve) => {
+		reader.onreading = (event) => {
+			display(event.message.records);
+			resolve(event.message.records);
+		};
+	});
 }
 
 
-// Called when NFC Data Received
-export async function nfcDidScan(data) {
-  const p = document.createElement('p');
-  p.innerText = data;
-  document.body.appendChild(p);
+/**
+ * Writes to an NFC Tag
+ * @param {string} type - The NFC payload type (T = text, U = URL)
+ * @param {string} content - The text or URL to write to the NFC
+ */
+export async function writeNFC(type, content) {
+  // TODO - implement webNFC
+  display(type);
+  display(content);
+	window.webkit.messageHandlers.nfcScan.postMessage({
+		write: content || "Empty Content",
+		type: type || "T",
+	});
 }
-
-

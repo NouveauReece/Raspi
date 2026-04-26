@@ -4,16 +4,29 @@ import PWALayout from "../layouts/PWALayout.astro";
 
 <PWALayout title="Home">
 	<h1>Raspi!</h1>
-	<button>Scan NFC</button>
+
+	<!-- Read -->
+	 <div>
+		<h2>Read</h2>
+		<button data-nfc-scan>Scan NFC</button>
+	</div>
+
+	<!-- Write -->
+	<div>
+		<h2>Write</h2>
+		<select name="select-nfc-write-type" id="select-nfc-write-type">
+			<option value="text">Text</option>
+			<option value="url">URL</option>
+		</select>
+		<textarea name="textarea-nfc-write-payload" id="textarea-nfc-write-payload"></textarea>
+		<button data-nfc-write data-type-from="select-nfc-write-type" data-payload-from="textarea-nfc-write-payload">Write NFC</button>
+	</div>
+
+	
+
 </PWALayout>
 
 <script>
-	import { setup, scanNFC } from "../scripts/nfc";
-
+	import { setup } from "../scripts/nfc";
 	setup();
-
-	document.querySelector("button")?.addEventListener("click", () => {
-        scanNFC();
-	});
-
 </script>
