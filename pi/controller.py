@@ -1,4 +1,5 @@
 from datetime import datetime
+import socket
 import time
 
 from audioctl import *
@@ -52,11 +53,9 @@ test_commands = {
 
 def drfid_written():
     drfid_str = drfid_read_string()
-    print("DRFID:", drfid_str)
+    print(drfid_str)
+    execute_command(drfid_str)
     
-    if drfid_str == 'startup':
-        test_startup()
-
 current_rfid = {
     "uid": None,
     "url": None,
@@ -74,20 +73,51 @@ def rfid_written(uid, read):
         current_rfid["time"] = datetime.now()
         print("UID: " + str(uid))
         print("RFID: " + read)
-
+        
 def mopidy_playback_callback(state):
     if state == 'playing':
         motor_spin()
     else:
         motor_stop()
-    
+
+
+def is_internet_connected():
+    try:
+        socket.create_connection(("1.1.1.1", 53))
+        return True
+    except OSError:
+        pass
+    return False
+
+def execute_command(command):
+    if command in test_commands:
+        test_commands[command]()
+    elif command in mopidy_commands:
+        if command == "add":
+            url = input("Enter url: ")
+            res = mopidy_commands["add"](url)
+        elif command == "mopidy_volume_set":
+            volume = int(input("Enter a value [0-100]: ")) / 100
+            res = mopidy_commands["mopidy_volume_set"](volume)
+        else:
+            res = mopidy_commands[command]()
+            print(res)
+    else:
+        print("Not a valid command!")
+
+        
 if __name__ == "__main__":
     try:
         init_gpio()
+
+        while not is_internet_connected():
+            time.sleep(1)
+        play_sound("/home/raspi/sounds/wifi.wav", "builtin")
         
         # Poll mopidy
         while not is_mopidy_connected():
             time.sleep(1)
+        play_sound("/home/raspi/sounds/spotify.wav", "builtin")
 
         # clear current mopidy queue
         mopidy_clear()
@@ -118,24 +148,12 @@ if __name__ == "__main__":
         # poll_for_playback_state(mopidy_playback_callback)
         
         while True:
-            command = input("Enter command: ").lower()
-            if command == "q":
-                break
-            elif command in test_commands:
-                test_commands[command]()
-            elif command in mopidy_commands:
-                if command == "add":
-                    url = input("Enter url: ")
-                    res = mopidy_commands["add"](url)
-                elif command == "mopidy_volume_set":
-                    volume = int(input("Enter a value [0-100]: ")) / 100
-                    res = mopidy_commands["mopidy_volume_set"](volume)
-                else:
-                    res = mopidy_commands[command]()
-                print(res)
-            else:
-                print("Not a valid command!")
-                continue
+            pass
+            # command = input("Enter command: ").lower()
+            # if command == "q":
+            #     break
+            # else:
+            #     execute_command(command)
     except KeyboardInterrupt:
         print("Quitting...")
     finally:

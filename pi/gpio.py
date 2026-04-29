@@ -4,7 +4,7 @@ from gpiozero.pins.lgpio import LGPIOFactory
 Device.pin_factory = LGPIOFactory()
 
 # Button pins
-SOURCE_PIN = 17
+SOURCE_PIN = 6
 SHUFFLE_PIN = 23
 VOLUME_UP_PIN = 22
 VOLUME_DN_PIN = 24
@@ -12,8 +12,8 @@ PREV_PIN = 5
 PLAY_PIN = 20
 NEXT_PIN = 27
 
-# Motor pins
-IN1_PIN = 6
+# Motor pin(s)
+IN1_PIN = 17
 
 GPIO_DEVICES = {}
 

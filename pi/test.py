@@ -1,26 +1,16 @@
-import RPi.GPIO as GPIO
+from gpiozero import RGBLED
 import time
 
-SWITCH_PIN = 16
+RED_PIN = 4
+GREEN_PIN = 14
+BLUE_PIN = 15
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(SWITCH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+rgb = RGBLED(red=RED_PIN, green=GREEN_PIN, blue=BLUE_PIN)
 
-def switch_changed(channel):
-    if GPIO.input(SWITCH_PIN) == GPIO.LOW:
-        print("Switch flicked ON")
-        # do something here
-    else:
-        print("Switch flicked OFF")
-        # do something else here
+colors = [(1,0,0), (0,1,0), (0,0,1), (1,1,0), (0,1,1), (1,0,1), (1,1,1)]
 
-GPIO.add_event_detect(SWITCH_PIN, GPIO.BOTH,
-                      callback=switch_changed,
-                      bouncetime=300)
+for c in colors:
+    rgb.color = c
+    time.sleep(1)
 
-print("Listening for switch changes...")
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    GPIO.cleanup()
+rgb.off()
