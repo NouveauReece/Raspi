@@ -131,8 +131,8 @@ if __name__ == "__main__":
         switch_to('builtin')
         
         # set gpio callbacks
-        GPIO_CALLBACK["source_on"] = lambda: switch_to("builtin")
-        GPIO_CALLBACK["source_off"] = lambda: switch_to("aux")
+        GPIO_CALLBACK["source_on"] = lambda: switch_to("aux")
+        GPIO_CALLBACK["source_off"] = lambda: switch_to("builtin")
         GPIO_CALLBACK["shuffle"] = mopidy_shuffle
         GPIO_CALLBACK["volume_up"] = lambda: volume_change(True)
         GPIO_CALLBACK["volume_dn"] = lambda: volume_change(False)

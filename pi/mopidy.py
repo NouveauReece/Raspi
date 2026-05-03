@@ -68,7 +68,7 @@ def mopidy_pause():
 def mopidy_next():
     return make_mopidy_request("core.playback.next")
 def mopidy_prev():
-    return make_mopidy_request("core.playback.prev")
+    return make_mopidy_request("core.playback.previous")
 def mopidy_stop():
     return make_mopidy_request("core.playback.stop")
 def mopidy_add(url):

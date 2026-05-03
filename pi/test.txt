@@ -1,0 +1,2 @@
+shuffle not working
+speakers not working

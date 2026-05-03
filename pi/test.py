@@ -7,10 +7,8 @@ BLUE_PIN = 15
 
 rgb = RGBLED(red=RED_PIN, green=GREEN_PIN, blue=BLUE_PIN)
 
-colors = [(1,0,0), (0,1,0), (0,0,1), (1,1,0), (0,1,1), (1,0,1), (1,1,1)]
-
-for c in colors:
-    rgb.color = c
-    time.sleep(1)
-
-rgb.off()
+try:
+    while True:
+        rgb.color = (1,0,1)
+except:
+    rgb.off()
