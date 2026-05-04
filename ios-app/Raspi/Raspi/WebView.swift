@@ -55,7 +55,7 @@ final class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate 
             }
         }
 
-        Task { [weak self] in
+        Task { [weak self] in 
             guard let self = self else { return }
             await self.nfcReader.read()
         }
