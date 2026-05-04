@@ -11,18 +11,33 @@ import PWALayout from "../layouts/PWALayout.astro";
 		<button data-nfc-scan>Scan NFC</button>
 	</div>
 
+	<hr>
+
 	<!-- Write -->
 	<div>
 		<h2>Write</h2>
+		<div class="grid">
 		<select name="select-nfc-write-type" id="select-nfc-write-type">
+			<option value="song">Song</option>
 			<option value="T">Text</option>
 			<option value="U">URL</option>
 		</select>
 		<textarea name="textarea-nfc-write-payload" id="textarea-nfc-write-payload"></textarea>
+		</div>
 		<button data-nfc-write data-type-from="select-nfc-write-type" data-payload-from="textarea-nfc-write-payload">Write NFC</button>
 	</div>
 
-	
+	<hr>
+
+	<h2>Motor</h2>
+	<div class="grid">
+		<button data-nfc-write-explicit data-type="T" data-payload="motor_start">Start Motor</button>
+		<button data-nfc-write-explicit data-type="T" data-payload="motor_stop">Stop Motor</button>
+	</div>
+
+	<hr>
+
+	<h2>Output</h2>
 
 </PWALayout>
 

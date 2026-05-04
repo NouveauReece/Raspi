@@ -1,0 +1,24 @@
+{
+  "originHash" : "226526780753b5063fac1e2300f892346ffa835dd636c5274b3c1b450569286b",
+  "pins" : [
+    {
+      "identity" : "coreextendednfc",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lakr233/CoreExtendedNFC.git",
+      "state" : {
+        "revision" : "a264fd330b21d049aa7133f44959c2c37ef3528f",
+        "version" : "1.0.7"
+      }
+    },
+    {
+      "identity" : "openssl-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lakr233/openssl-spm.git",
+      "state" : {
+        "revision" : "9f3b525d960fe71e534482310e96cd9c4f2faa17",
+        "version" : "3.6.2"
+      }
+    }
+  ],
+  "version" : 3
+}

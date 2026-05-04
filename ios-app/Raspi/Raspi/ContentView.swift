@@ -9,18 +9,22 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    
+
+    // Both stored as constants so they're never recreated on body re-evaluation
     private let webView: WKWebView = {
-        let contentController = WKUserContentController()
         let config = WKWebViewConfiguration()
-        config.userContentController = contentController
+        config.userContentController = WKUserContentController()
         return WKWebView(frame: .zero, configuration: config)
     }()
-    
-    private var nfcReader: NFCReader { NFCReader(wv: webView) }
+
+    private let nfcReader: NFCReader
+
+    init() {
+        nfcReader = NFCReader(wv: webView)
+    }
 
     var body: some View {
-        WebView(webView: self.webView, url: URL(string: "http://raspinonpwa.reecen.dev/")!, nfcReader: nfcReader)
+        WebView(webView: webView, url: URL(string: "http://raspinonpwa.reecen.dev/")!, nfcReader: nfcReader)
             .webViewBackForwardNavigationGestures(.disabled)
             .scrollBounceBehavior(.basedOnSize, axes: [.vertical, .horizontal])
             .webViewLinkPreviews(.disabled)

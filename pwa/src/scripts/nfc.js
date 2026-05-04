@@ -21,6 +21,22 @@ export async function setup() {
       document.querySelector(`#${e.target.getAttribute('data-payload-from')}`).value
     ) 
   });
+  
+  document.querySelectorAll("[data-nfc-write-explicit]").forEach(el => {
+	el.addEventListener("click", (e) => {
+		writeNFC(
+			e.target.getAttribute('data-type'),
+			e.target.getAttribute('data-payload')
+		)
+	})
+  });
+
+  document.querySelector("[data-nfc-write-explicit]").addEventListener("click", (e) => { 
+    writeNFC(
+      document.querySelector(`#${e.target.getAttribute('data-type-from')}`).value,
+      document.querySelector(`#${e.target.getAttribute('data-payload-from')}`).value
+    ) 
+  });
 
 }
 
@@ -81,8 +97,21 @@ export async function writeNFC(type, content) {
   // TODO - implement webNFC
   display(type);
   display(content);
+  if (type != "song") {
 	window.webkit.messageHandlers.nfcScan.postMessage({
 		write: content || "Empty Content",
 		type: type || "T",
 	});
+	} else {
+		const songData = {
+			"uuid" : crypto.randomUUID(),
+			"cmd" : "song_write",
+			"url" : content
+		}
+		display(JSON.stringify(songData));
+		window.webkit.messageHandlers.nfcScan.postMessage({
+			write: songData,
+			type: "T",
+		});
+	}
 }

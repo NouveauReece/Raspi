@@ -18,6 +18,7 @@ const { title } = Astro.props as Props;
     <meta name="theme-color" content="#ffffff">
     <title>{title} | Raspi</title>
     <meta name="description" content={title}>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <style>
     main, footer {
         text-align: center;
@@ -27,7 +28,7 @@ const { title } = Astro.props as Props;
   </head>
   <body>
     
-    <main>
+    <main class="container">
       <slot></slot>
     </main>
 
